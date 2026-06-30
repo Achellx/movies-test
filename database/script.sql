@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS Movies_DB;
 USE Movies_DB;
 
-CREATE TABLE Director (
+CREATE TABLE Directors (
     id INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(200) NOT NULL,
     Nationality VARCHAR(100) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE Director (
 CREATE TABLE Movies (
     id INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
-    ReleaseYear DATE NOT NULL,
+    ReleaseYear INT NOT NULL,
     Genre VARCHAR(50) NOT NULL,
     Duration TIME NOT NULL,
     FKDirector INT NOT NULL,
