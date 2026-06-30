@@ -13,7 +13,7 @@ CREATE TABLE Movies (
     id INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
     ReleaseYear DATE NOT NULL,
-    Gender VARCHAR(50) NOT NULL,
+    Genre VARCHAR(50) NOT NULL,
     Duration TIME NOT NULL,
     FKDirector INT NOT NULL,
     FOREIGN KEY (FKDirector) REFERENCES Director(id)
