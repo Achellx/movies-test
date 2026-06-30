@@ -1,0 +1,31 @@
+.simple-container {
+    display: flex;
+}
+
+.direction-column {
+    flex-direction: column;
+}
+
+.direction-row {
+    flex-direction: row;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.width-100 {
+    width: 100%;
+}
+
+.max-width-1000 {
+    max-width: 1000px;
+}
+
+.grow-1 {
+    flex-grow: 1;
+}
+
+.gap-24 {
+    gap: 24px;
+}

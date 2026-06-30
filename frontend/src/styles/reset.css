@@ -13,4 +13,5 @@ input, button, textarea, select {
 img, svg, video {
     display: block;
     max-width: 100%;
+    vertical-align: middle;
 }
