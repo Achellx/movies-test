@@ -15,6 +15,7 @@ CREATE TABLE Movies (
     ReleaseYear INT NOT NULL,
     Genre VARCHAR(50) NOT NULL,
     Duration TIME NOT NULL,
+    Active BOOLEAN NOT NULL DEFAULT 1,
     FKDirector INT NOT NULL,
     FOREIGN KEY (FKDirector) REFERENCES Directors(id)
 );

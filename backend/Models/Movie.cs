@@ -8,8 +8,8 @@ public class Movie
     public int ReleaseYear { get; set; }
     public string Genre { get; set; } = string.Empty;
     public TimeSpan Duration { get; set; }
-    public int FKDirector { get; set; }
-    
+    public bool Active { get; set; } = true;
+    public int FKDirector { get; set; }    
     [ForeignKey(nameof(FKDirector))]
     public Director Director { get; set; } = null!;
 

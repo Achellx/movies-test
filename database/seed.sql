@@ -1,4 +1,6 @@
 USE Movies_DB;
+DROP TABLE IF EXISTS Movies;
+DROP TABLE IF EXISTS Directors;
 
 INSERT INTO Directors (Name, Nationality, Age, Active) VALUES
 ('Christopher Nolan', 'British',       54, 1),

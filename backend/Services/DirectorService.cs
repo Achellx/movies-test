@@ -16,10 +16,10 @@ public class DirectorService : IDirectorService
 
     public async Task<IEnumerable<DirectorDto>> GetAllAsync()
     {
-        return await _context.Directors
+        var directors = await _context.Directors
             .AsNoTracking()
-            .Select(d => MapToDto(d))
             .ToListAsync();
+        return directors.Select(MapToDto);
     }
 
     public async Task<DirectorDto?> GetByIdAsync(int id)
@@ -65,7 +65,7 @@ public class DirectorService : IDirectorService
         var director = await _context.Directors.FindAsync(id);
         if (director is null) return false;
 
-        _context.Directors.Remove(director);
+        director.Active = false;
         await _context.SaveChangesAsync();
         return true;
     }

@@ -31,7 +31,7 @@ public class MovieService : IMovieService
 
     public async Task<MovieDto?> CreateAsync(CreateMovieDto dto)
     {
-        var directorExists = await _context.Directors.AnyAsync(d => d.Id == dto.FKDirector);
+        var directorExists = await _context.Directors.AnyAsync(d => d.Id == dto.FKDirector && d.Active);
         if (!directorExists) return null;
 
         var movie = new Movie
@@ -58,7 +58,7 @@ public class MovieService : IMovieService
             return MovieUpdateResult.MovieNotFound;
 
 
-        var directorExists = await _context.Directors.AnyAsync(d => d.Id == dto.FKDirector);
+        var directorExists = await _context.Directors.AnyAsync(d => d.Id == dto.FKDirector && d.Active);
         if (!directorExists) return MovieUpdateResult.DirectorNotFound;
 
         movie.Name = dto.Name;
@@ -76,7 +76,7 @@ public class MovieService : IMovieService
         var movie = await _context.Movies.FindAsync(id);
         if (movie is null) return false;
 
-        _context.Movies.Remove(movie);
+        movie.Active = false;
         await _context.SaveChangesAsync();
         return true;
     }
@@ -89,6 +89,7 @@ public class MovieService : IMovieService
         Genre = m.Genre,
         Duration = m.Duration,
         FKDirector = m.FKDirector,
-        DirectorName = m.Director?.Name ?? String.Empty
+        DirectorName = m.Director?.Name ?? String.Empty,
+        Active = m.Active
     };
 }
