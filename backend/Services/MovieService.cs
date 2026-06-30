@@ -16,13 +16,16 @@ public class MovieService : IMovieService
 
     public async Task<IEnumerable<MovieDto>> GetAllAsync()
     {
-        var movies = await _context.Movies.Include(m => m.Director).ToListAsync();
+        var movies = await _context.Movies
+        .AsNoTracking()
+        .Include(m => m.Director)
+        .ToListAsync();
         return movies.Select(MapToDto);
     }
 
     public async Task<MovieDto?> GetByIdAsync(int id)
     {
-        var movie = await _context.Movies.Include(m => m.Director).FirstOrDefaultAsync(m => m.Id == id);
+        var movie = await _context.Movies.AsNoTracking().Include(m => m.Director).FirstOrDefaultAsync(m => m.Id == id);
         return movie is null ? null : MapToDto(movie);
     }
 

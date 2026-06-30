@@ -17,13 +17,14 @@ public class DirectorService : IDirectorService
     public async Task<IEnumerable<DirectorDto>> GetAllAsync()
     {
         return await _context.Directors
+            .AsNoTracking()
             .Select(d => MapToDto(d))
             .ToListAsync();
     }
 
     public async Task<DirectorDto?> GetByIdAsync(int id)
     {
-        var director = await _context.Directors.FindAsync(id);
+        var director = await _context.Directors.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
         return director is null ? null : MapToDto(director);
     }
 
