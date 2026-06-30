@@ -1,0 +1,14 @@
+namespace backend.Models;
+
+public class Movie
+{
+    public int id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int ReleaseYear { get; set; }
+    public string Genre { get; set; } = string.Empty;
+    public TimeSpan Duration { get; set; }
+    public int FKDirector { get; set; }
+
+    public Director Director { get; set; } = null!;
+
+}
