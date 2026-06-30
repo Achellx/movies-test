@@ -1,3 +1,5 @@
+USE Movies_DB;
+
 INSERT INTO Directors (Name, Nationality, Age, Active) VALUES
 ('Christopher Nolan', 'British',       54, 1),
 ('Hayao Miyazaki',    'Japanese',      85, 1),

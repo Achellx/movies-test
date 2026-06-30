@@ -16,5 +16,5 @@ CREATE TABLE Movies (
     Genre VARCHAR(50) NOT NULL,
     Duration TIME NOT NULL,
     FKDirector INT NOT NULL,
-    FOREIGN KEY (FKDirector) REFERENCES Director(id)
+    FOREIGN KEY (FKDirector) REFERENCES Directors(id)
 );
