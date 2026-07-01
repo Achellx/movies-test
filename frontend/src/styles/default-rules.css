@@ -14,10 +14,17 @@
     align-items: center;
 }
 
+.justify-between {
+    justify-content: space-between;
+}
+
 .width-100 {
     width: 100%;
 }
 
+.max-width-800 {
+    max-width: 800px;
+}
 .max-width-1000 {
     max-width: 1000px;
 }
@@ -26,6 +33,31 @@
     flex-grow: 1;
 }
 
+.gap-8 {
+    gap: 8px;
+}
 .gap-24 {
     gap: 24px;
+}
+
+.padding-8 {
+    padding: 8px;
+}
+.padding-16 {
+    padding: 16px;
+}
+
+.hover-outline {
+    transition:box-shadow 0.3s cubic-bezier(0, 0, 0.5, 1);
+}
+.hover-outline:hover {
+    box-shadow: 0 0 0 1px var(--color-border) inset;
+}
+
+.outline-text {
+    color: var(--color-text-muted);
+}
+
+.line-height-1 {
+    line-height: 1;
 }

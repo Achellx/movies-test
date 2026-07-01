@@ -210,11 +210,9 @@ watch(
 @keyframes async-fade { 
     from { 
         opacity: 0; 
-        transform: translateY(4px); 
     } 
     to { 
         opacity: 1; 
-        transform: none; 
     } 
 }
 
@@ -224,6 +222,7 @@ watch(
     opacity: 0.6;
     animation: async-pulse 1s ease-in-out infinite;
 }
+
 @keyframes async-pulse { 
     50% { opacity: 0.2; } 
 }

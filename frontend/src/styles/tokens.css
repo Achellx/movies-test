@@ -19,6 +19,12 @@
     --color-primary-hover: var(--color-10);
     --color-primary-text: var(--color-1);
 
+    --display-large: 32px;
+    --display-medium: 24px;
+    --display-small: 20px;
+
+    --title: 16px;
+    --body: 14px;
 
     --font: 'Inter Variable', system-ui, sans-serif;
 }

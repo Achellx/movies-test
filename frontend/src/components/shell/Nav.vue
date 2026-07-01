@@ -73,7 +73,7 @@ nav.app-nav {
     gap: 8px;
     padding: 4px;
     border-radius: 999px;
-    background: var(--color-surface);
+    background: var(--color-bg);
     color: var(--color-text-muted);
     box-shadow: inset 0 0 0 1px var(--color-border), 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -118,13 +118,7 @@ nav.app-nav {
     inset: 0;
     z-index: 0;
     border-radius: 999px;
-    background: #FFF;
-}
-
-@media (prefers-color-scheme: dark) {
-    .nav-pill {
-        background: #000;
-    }
+    background: var(--color-surface);
 }
 
 .nav-item svg {
@@ -153,7 +147,7 @@ nav.app-nav {
     transform: translateX(-50%) translateY(12px) scale(0.8);
     pointer-events: none;
     filter: blur(8px);
-    transition: opacity 0.15s, transform 0.15s ease-out, filter 0.15s ease-out;
+    transition: opacity 0.15s, transform 0.15s cubic-bezier(.4, 0, .2, 1), filter 0.15s cubic-bezier(.4, 0, .2, 1);
     user-select: none;
 }
 
