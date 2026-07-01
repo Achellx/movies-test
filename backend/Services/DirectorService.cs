@@ -18,6 +18,7 @@ public class DirectorService : IDirectorService
     {
         var directors = await _context.Directors
             .AsNoTracking()
+            .OrderBy(d => d.Name)
             .ToListAsync();
         return directors.Select(MapToDto);
     }

@@ -19,6 +19,7 @@ public class MovieService : IMovieService
         var movies = await _context.Movies
         .AsNoTracking()
         .Include(m => m.Director)
+        .OrderByDescending(m => m.Id)
         .ToListAsync();
         return movies.Select(MapToDto);
     }
