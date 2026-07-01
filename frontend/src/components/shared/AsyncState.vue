@@ -216,15 +216,4 @@ watch(
     } 
 }
 
-.async-fetching {
-    height: 2px;
-    background: var(--color-primary);
-    opacity: 0.6;
-    animation: async-pulse 1s ease-in-out infinite;
-}
-
-@keyframes async-pulse { 
-    50% { opacity: 0.2; } 
-}
-
 </style>
