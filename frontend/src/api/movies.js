@@ -1,0 +1,11 @@
+import { http } from './http';
+
+export async function getMovies() {
+    const { data } = await http.get('/movies');
+    return data;
+}
+
+export async function createMovie(payload) {
+    const { data } = await http.post('/movies', payload);
+    return data;
+}
