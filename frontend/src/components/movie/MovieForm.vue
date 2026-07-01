@@ -102,7 +102,11 @@ function validate() {
 
     if (!form.genre.trim()) errors.genre = 'Genre is mandatory';
 
-    if (form.hours === 0 && form.minutes ===0 ) errors.duration = 'Duration is mandatory';
+    if (form.hours === 0 && form.minutes ===0 ) {
+        errors.duration = 'Duration is mandatory';
+    } else if (form.hours < 0 || form.hours > 23 || form.minutes < 0 || form.minutes > 59) {
+        errors.duration = 'Duration must be a valid time (0-23 hours, 0-59 minutes)';
+    }
 
     if (!form.fKDirector) errors.fKDirector = 'Director is mandatory';
 
@@ -131,7 +135,7 @@ function handleSubmit() {
         novalidate
         @submit.prevent="handleSubmit"
     >
-        <span class="body weight-500 padding-8 text-center outline-text">{{ title }}</span>
+        <span class="display-medium weight-500 padding-8 outline-text">{{ title }}</span>
 
         <div class="input-box">
             <input
@@ -174,7 +178,7 @@ function handleSubmit() {
                 v-model="form.hours"
                 type="number"
                 min="0"
-                max="24"
+                max="23"
                 placeholder="Hours"
                 :disabled="submiting"
                 :data-error="errors.duration ? 'true' : null" 
@@ -259,9 +263,18 @@ button {
     will-change: transform, filter;
 }
 
+button.secondary {
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-surface);
+    box-shadow: inset 0 1.5px #fff6;
+}
+
 button.primary {
     background: var(--color-12);
     color: var(--color-primary-text);
+    border: 1px solid var(--color-12);
+    box-shadow: inset 0 1.5px #fff3;
 }
 
 button:hover {
@@ -283,18 +296,25 @@ button:active {
 }
 
 input, select {
-    background: color-mix(in oklch, var(--color-surface) 60%, transparent);
+    background: var(--color-bg);
     text-align: center;
-    border-radius: 14px;
+    border-radius: 12px;
     width: 100%;
     padding: 12px;
     letter-spacing: -.4px;
     border: none;
     outline: none;
     font-size: 15px;
+    box-shadow: 0 0 0 .5px #0000000d, 0 .5px 2.5px #0000001f;
     color: var(--color-text);
     user-select: none;
     transition: all .3s;
+}
+
+@media (prefers-color-scheme: dark) {
+    input, select {
+        box-shadow: 0 0 0 .5px #2a2a2a, 0 .5px 2.5px #00000029;
+    }
 }
 
 select {

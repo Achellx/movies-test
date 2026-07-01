@@ -234,7 +234,7 @@ defineExpose({ open, close });
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 14px;
+  padding: 16px;
 }
 
 .morph-shell-backdrop {

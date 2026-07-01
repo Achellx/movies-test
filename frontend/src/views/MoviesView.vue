@@ -1,10 +1,30 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import MoviesList from '@/components/movie/MoviesList.vue'
 import MorphShell from '@/components/shared/MorphShell.vue'
 import MovieForm from '@/components/movie/MovieForm.vue'
+import { useDirectors } from '@/composables/useDirectors'
+import { useCreateMovie } from '@/composables/useMovies'
 
 const formOpen = ref(false)
+
+const { data: directors } = useDirectors();
+
+const activeDirectors = computed(() => (directors.value ?? []).filter(d => d.active))
+
+const createMovie = useCreateMovie();
+
+const submitting = computed(() => createMovie.isPending.value);
+
+async function handleSubmit(payload) {
+    try {
+        await createMovie.mutateAsync(payload);
+        formOpen.value = false;
+    } catch (error) {
+        console.error('Error creating movie:', error);
+    }
+}
+
 </script>
 
 <template>
@@ -30,7 +50,9 @@ const formOpen = ref(false)
                     <div class="morph-form-wrap">
                         <MovieForm 
                             :active="formOpen"
-                            @submit="close" 
+                            :directors="activeDirectors"
+                            :submitting="submitting"
+                            @submit="handleSubmit" 
                             @cancel="close" 
                         />
                     </div>
@@ -54,12 +76,14 @@ const formOpen = ref(false)
 }
 
 .morph-form-wrap {
-    width: 380px;
+    width: 270px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 680px) {
     .morph-form-wrap {
-        width: calc(100vw - 32px);
+        max-height: unset;
+        height: 100%;
+        width: calc(100dvw - 32px);
     }
 }
 </style>
