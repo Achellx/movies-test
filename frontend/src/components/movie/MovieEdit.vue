@@ -17,7 +17,15 @@ const formOpen = ref(false)
 
 const { data: directors } = useDirectors();
 
-const activeDirectors = computed(() => (directors.value ?? []).filter(d => d.active))
+const directorOptions = computed(() => {
+    const list = (directors.value ?? []).filter(d => d.active)
+    const current = props.movie.fkDirector;
+
+    if (current !== null && !list.some(d => d.id === current)) {
+        return [...list, { id: current, name: props.movie.directorName, active: false }];
+    }
+    return list;
+})
 
 const updateMovie = useUpdateMovie();
 
@@ -54,7 +62,7 @@ async function handleSubmit(payload) {
                 <MovieForm 
                     :active="formOpen"
                     :initial-values="movie"
-                    :directors="activeDirectors"
+                    :directors="directorOptions"
                     :submitting="submitting"
                     title="Edit Movie"
                     submit-label="Save"

@@ -212,7 +212,7 @@ function handleSubmit() {
                     :key="director.id"
                     :value="director.id"
                 >
-                    {{ director.name }}
+                    {{ director.name }}{{ director.active === false ? ' (Inactive)' : '' }}
                 </option>
             </select>
         </div>
