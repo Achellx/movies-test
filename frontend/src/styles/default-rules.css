@@ -54,12 +54,22 @@
 .padding-16 {
     padding: 16px;
 }
+.padding-24 {
+    padding: 24px !important;
+}
 
 .hover-outline {
     transition:box-shadow 0.3s cubic-bezier(0, 0, 0.5, 1);
 }
 .hover-outline:hover {
     box-shadow: 0 0 0 1px var(--color-border) inset;
+}
+.hover-delete {
+    transition: background .25s cubic-bezier(0, 0, .5, 1), color .25s cubic-bezier(0, 0, .5, 1) !important;
+}
+.hover-delete:hover {
+    background: var(--color-danger) !important;
+    color: var(--color-danger-text) !important;
 }
 
 .outline-text {

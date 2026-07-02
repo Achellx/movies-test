@@ -31,6 +31,10 @@ const props = defineProps({
     type: Number, 
     default: 8 
   },
+  class: {
+    type: String,
+    default: ""
+  }
 });
 
 const expanded = defineModel({ type: Boolean, default: false });
@@ -224,7 +228,7 @@ defineExpose({ open, close });
         :style="{ pointerEvents: isOpen ? 'auto' : 'none' }"
         @click.stop
       >
-        <div ref="contentRef" class="morph-content">
+        <div ref="contentRef" class="morph-content" :class="class">
           <slot name="expanded" :close="close" />
         </div>
       </motion.div>

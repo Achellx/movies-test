@@ -51,12 +51,12 @@ button.style-2.background {
     color: var(--color-text-muted);
 }
 
-button.style-2:hover {
+button.style-2:not(.hover-delete):hover {
     filter: brightness(0.90);
 }
 
 @media (prefers-color-scheme: dark) {
-    button.style-2:hover {
+    button.style-2:not(.hover-delete):hover {
         filter: brightness(0.65);
     }
 }

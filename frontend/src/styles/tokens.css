@@ -19,6 +19,9 @@
     --color-primary-hover: var(--color-10);
     --color-primary-text: var(--color-1);
 
+    --color-danger: oklch(0.6 0.2 25);
+    --color-danger-text: oklch(0.96 0.03 25);
+
     --display-large: 32px;
     --display-medium: 24px;
     --display-small: 20px;
