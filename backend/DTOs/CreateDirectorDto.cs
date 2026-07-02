@@ -9,7 +9,7 @@ public class CreateDirectorDto
     [Required(ErrorMessage = "Nationality is mandatory")]
     public string Nationality { get; set; } = string.Empty;
 
-    [Range(0, 130, ErrorMessage = "Age must be between 0 and 130")]
+    [Range(1, 130, ErrorMessage = "Age must be between 1 and 130")]
     public int Age { get; set; }
     public bool Active { get; set; } = true;
 }
