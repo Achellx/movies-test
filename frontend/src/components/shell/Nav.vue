@@ -1,6 +1,11 @@
 <script setup>
-import { useRoute, useRouter } from 'vue-router'
+import { ref, nextTick, watch, onUnmounted } from 'vue'
 import { motion } from 'motion-v'
+import search from '@/assets/icons/search.svg'
+import close from '@/assets/icons/close.svg'
+import { useSearch } from '@/composables/useSearch'
+
+const { query } = useSearch();
 
 const props = defineProps({
     items: {
@@ -9,41 +14,155 @@ const props = defineProps({
     }
 })
 
-const route = useRoute();
-const router = useRouter();
-</script>
+const clipping = ref(false);
+const shellRef = ref(null);
 
+const spring = {
+    type: 'spring',
+    damping: 20,
+    stiffness: 230,
+    mass: 1.7
+}
+
+const searchOpen = ref(false);
+const inputRef = ref(null);
+
+function onDocClick(e) {
+    if (shellRef.value && !shellRef.value.contains(e.target)) {
+        closeSearch();
+    }
+}
+
+watch(searchOpen, (open) => {
+    if (open) {
+        document.addEventListener('click', onDocClick);
+    } else {
+        document.removeEventListener('click', onDocClick);
+    }
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', onDocClick);
+});
+
+async function openSearch() {
+    searchOpen.value = true;
+    await nextTick();
+    inputRef.value.focus();
+}
+
+function closeSearch() {
+    searchOpen.value = false;
+    query.value = '';
+}
+
+</script>
 
 <template>
     <nav class="app-nav">
-        <div class="nav-shell">
-            <div class="nav-search">
-            </div>
+        <div class="nav-shell" ref="shellRef">
+            <motion.div 
+                class="nav-items search-pill"
+                :class="{ 'is-expanded': searchOpen }"
+                :layout="true"
+                :transition="spring"
+                @click="!searchOpen && openSearch()"
+            >
+                <div class="nav-item search-trigger">
+                    <component :is="search" />
+                    <span class="nav-label">Search</span>
+                </div>
 
-            <div class="nav-items">
-                <RouterLink
-                    v-for="item in items"
-                    :key="item.name"
-                    :to="{ name: item.name }"
-                    custom
-                    v-slot="{ isActive, navigate }"
+                <motion.div
+                    class="search-input-wrap"
+                    :initial="false"
+                    :animate="{
+                        width: searchOpen ? 'auto' : '0px',
+                        opacity: searchOpen ? 1 : 0,
+                        filter: searchOpen ? 'blur(0px)' : 'blur(4px)',
+                    }"
+                    :transition="spring"
                 >
-                    <button
-                        class="nav-item"
-                        :class="{ 'is-active': isActive }"
-                        @click="navigate"
+                    <input
+                        ref="inputRef"
+                        v-model="query"
+                        class="search-input"
+                        type="text"
+                        placeholder="Search movies or directos"
+                        @click.stop
+                        @keydown.escape="closeSearch"
+                    />            
+                </motion.div>
+            </motion.div>
+
+            <motion.div 
+                class="nav-items links-pill"
+                :layout="true"
+                :transition="spring"
+            >
+
+                <motion.div
+                    class="links-clip"
+                    :style="{ overflow: clipping ? 'hidden' : 'visible'}"
+                    :initial="false"
+                    :animate="{ width: searchOpen ? '44px' : 'auto' }"
+                    :transition="spring"
+                    @animationStart="clipping = true"
+                    @animationComplete="clipping = false"
+                >
+                    <motion.div
+                        class="links-group"
+                        :initial="false"
+                        :animate="{
+                            opacity: searchOpen ? 0 : 1,
+                            filter: searchOpen ? 'blur(4px)' : 'blur(0px)'
+                        }"
+                        :transition="{ duration: 0.2 }"
                     >
-                        <motion.div
-                            v-if="isActive"
-                            layout-id="nav-pill"
-                            class="nav-pill"
-                            :transition="{ type: 'spring', bounce: 0.4, duration: 0.5 }"
-                        />
-                        <component :is="item.icon" />
-                        <span class="nav-label">{{ item.label }}</span>
-                </button>
-            </RouterLink>
-            </div>
+                        <RouterLink
+                            v-for="item in items"
+                            :key="item.name"
+                            :to="{ name: item.name }"
+                            custom
+                            v-slot="{ isActive, navigate }"
+                        >
+                            <button
+                                class="nav-item"
+                                :class="{ 'is-active': isActive }"
+                                @click="navigate"
+                            >
+                                <motion.div
+                                    v-if="isActive"
+                                    layout-id="nav-pill"
+                                    class="nav-pill"
+                                    :transition="{ type: 'spring', bounce: 0.4, duration: 0.5 }"
+                                />
+                                <component :is="item.icon" />
+                                <span class="nav-label">{{ item.label }}</span>
+                            </button>
+                        </RouterLink>
+                    </motion.div>
+
+                    <motion.div
+                        class="links-close"
+                        :initial="false"
+                        :animate="{
+                            opacity: searchOpen ? 1 : 0,
+                            filter: searchOpen ? 'blur(0px)' : 'blur(4px)'
+                        }"
+                        :transition="{ duration: 0.2 }"
+                    >
+                        <button
+                            :style="{ pointerEvents: searchOpen ? 'auto': 'none'}"
+                            type="button"
+                            class="nav-item"
+                        >
+                            <component :is="close" @click="closeSearch" />
+                            <span class="nav-label">Close</span>
+                        </button>
+                    </motion.div>
+                </motion.div>
+            </motion.div>
         </div>
     </nav>
 </template>
@@ -64,7 +183,7 @@ nav.app-nav {
     display: inline-flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    gap: 12px;
 }
 
 .nav-items {
@@ -75,7 +194,60 @@ nav.app-nav {
     border-radius: 999px;
     background: var(--color-bg);
     color: var(--color-text-muted);
-    box-shadow: inset 0 0 0 1px var(--color-border), 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 0 0 1.5px var(--color-surface-hover), 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: visible;
+}
+
+.nav-items.search-pill {
+    gap: 0;
+}
+
+.search-pill {
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.search-pill.is-expanded {
+    flex: 1;
+    cursor: text;
+}
+
+.search-input-wrap {
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    pointer-events: auto;
+}
+
+.search-input {
+    width: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--color-text);
+    font-size: 15px;
+}
+
+.links-clip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+}
+
+.links-group {
+    display: inline-flex;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.links-close {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .nav-search {
@@ -83,13 +255,21 @@ nav.app-nav {
     align-items: center;
     justify-content: center;
     padding: 4px;
+    height: 100%;
+    width: 100%;
+    min-width: 44px;
+    min-height: 44px;
     border-radius: 999px;
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 .nav-item {
     position: relative;
     display: flex;
-    width: 100%;
     height: 100%;
     min-width: 44px;
     min-height: 44px;

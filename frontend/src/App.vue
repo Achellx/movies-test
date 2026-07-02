@@ -51,6 +51,7 @@ const navItems = [
     gap: 8px;
     overflow: auto;
     scrollbar-width: thin;
+    scrollbar-gutter: stable;
 }
 
 .animation-loading-1 {

@@ -1,15 +1,29 @@
 <script setup>
+import { computed } from 'vue'
+import { useSearch } from '@/composables/useSearch.js'
 import EntityList from '@/components/shared/EntityList.vue'
 import MovieCard from '@/components/movie/MovieCard.vue'
 import { useMovies } from '@/composables/useMovies.js'
 
 const { data, isLoading, isFetching, error, refetch } = useMovies();
 
+const { query } = useSearch();
+
+const filtered = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    if (!q) return data.value ?? [];
+    return (data.value ?? []).filter(m => 
+        m.name.toLowerCase().includes(q) ||
+        m.genre.toLowerCase().includes(q) ||
+        m.directorName.toLowerCase().includes(q)
+    )
+})
+
 </script>
 
 <template>
     <EntityList
-        :items="data ?? []"
+        :items="filtered"
         :is-loading="isLoading"
         :is-fetching="isFetching"
         :error="error"
@@ -19,12 +33,10 @@ const { data, isLoading, isFetching, error, refetch } = useMovies();
         :refetch="refetch"
     >
         <template #item="{ item, index }">
-            <div class="items-container">
-                <MovieCard
-                    :movie="item"
-                    :index="index"
-                />
-            </div>
+            <MovieCard
+                :movie="item"
+                :index="index"
+            />
         </template>
     </EntityList>
 </template>

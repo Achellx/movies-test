@@ -1,15 +1,30 @@
 <script setup>
+import { computed } from 'vue'
 import EntityList from '@/components/shared/EntityList.vue'
 import DirectorCard from '@/components/director/DirectorCard.vue'
 import { useDirectors } from '@/composables/useDirectors.js'
+import { useSearch } from '@/composables/useSearch.js'
 
 const { data, isLoading, isFetching, error, refetch } = useDirectors();
+
+const { query } = useSearch();
+
+const filtered = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    if (!q) return data.value ?? [];
+    return (data.value ?? []).filter(d => 
+        d.name.toLowerCase().includes(q) ||
+        d.nationality.toLowerCase().includes(q) ||
+        d.age.toString().toLowerCase().includes(q)
+    )
+})
+
 
 </script>
 
 <template>
     <EntityList
-        :items="data ?? []"
+        :items="filtered"
         :is-loading="isLoading"
         :is-fetching="isFetching"
         :error="error"
