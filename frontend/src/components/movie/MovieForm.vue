@@ -135,7 +135,7 @@ function handleSubmit() {
         novalidate
         @submit.prevent="handleSubmit"
     >
-        <span class="display-medium weight-500 padding-8 outline-text">{{ title }}</span>
+        <span class="display-large weight-500 padding-8 outline-text">{{ title }}</span>
 
         <div class="input-box">
             <input

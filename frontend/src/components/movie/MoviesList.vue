@@ -1,4 +1,5 @@
 <script setup>
+import { AnimatePresence } from 'motion-v'
 import MovieCard from '@/components/movie/MovieCard.vue'
 import AsyncState from '@/components/shared/AsyncState.vue'
 import { useMovies } from '@/composables/useMovies'
@@ -20,12 +21,14 @@ const { data, isLoading, isFetching, error, refetch } = useMovies();
     >
         <template #default="{ data }">
             <div class="items-container">
-                <MovieCard
-                    v-for="(movie, i) in data"
-                    :key="movie.id"
-                    :movie="movie"
-                    :index="i"
-                />
+                <AnimatePresence mode="popLayout">
+                    <MovieCard
+                        v-for="(movie, i) in data"
+                        :key="movie.id"
+                        :movie="movie"
+                        :index="i"
+                    />
+                </AnimatePresence>
             </div>
         </template>
     </AsyncState>
@@ -33,6 +36,7 @@ const { data, isLoading, isFetching, error, refetch } = useMovies();
 
 <style scoped>
 .items-container {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 8px;
