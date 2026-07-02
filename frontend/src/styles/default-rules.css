@@ -34,7 +34,7 @@
     max-width: 1000px;
 }
 
-.grow-1 {
+.grow {
     flex-grow: 1;
 }
 
@@ -56,6 +56,11 @@
 }
 .padding-24 {
     padding: 24px !important;
+}
+
+.l-r-padding-8 {
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .hover-outline {
