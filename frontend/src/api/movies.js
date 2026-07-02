@@ -9,3 +9,8 @@ export async function createMovie(payload) {
     const { data } = await http.post('/movies', payload);
     return data;
 }
+
+export async function updateMovie({id, payload}) {
+    const { data } = await http.put(`/movies/${id}`, payload);
+    return data;
+}

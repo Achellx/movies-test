@@ -1,8 +1,8 @@
 <script setup>
-import edit from '@/assets/icons/edit.svg'
 import deleteIcon from '@/assets/icons/deleteIcon.svg'
 import calendar from '@/assets/icons/calendar.svg'
 import during from '@/assets/icons/during.svg'
+import MovieEdit from '@/components/movie/MovieEdit.vue'
 import { motion } from 'motion-v'
 
 defineProps({
@@ -36,12 +36,7 @@ function formatDate(value) {
         }"
         >
         <div class="action-buttons">
-            <button
-                class="style-2 background"
-                type="button"
-            >
-                <component :is="edit" />
-            </button>
+            <MovieEdit :movie="movie" />
             <button
                 class="style-2 background"
                 type="button"
@@ -82,7 +77,6 @@ function formatDate(value) {
     border-radius: 40px;
     padding:  16px;
     background-color: var(--color-surface);
-    overflow: hidden;
     gap: 24px;
     justify-content: space-between;
     aspect-ratio: 1 / 1;

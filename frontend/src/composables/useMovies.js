@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
-import { getMovies, createMovie } from '@/api/movies';
+import { getMovies, createMovie, updateMovie } from '@/api/movies';
 
 const moviesKey = ['movies'];
 
@@ -19,5 +19,17 @@ export function useCreateMovie() {
                 queryKey: moviesKey,
             });
         },
+    })
+}
+
+export function useUpdateMovie() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: updateMovie,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: moviesKey,
+            });
+        }
     })
 }
