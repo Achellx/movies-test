@@ -1,3 +1,7 @@
+button {
+    user-select: none;
+}
+
 button.style-1 {
     position: relative;
     display: inline-flex;

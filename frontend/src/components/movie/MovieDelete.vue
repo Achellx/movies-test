@@ -50,6 +50,7 @@ async function handleDelete() {
                     title="Delete Movie"
                     confirmLabel="Delete"
                     :danger="true"
+                    :busy="busy"
                     @confirm="handleDelete"
                     @cancel="close"
                 />

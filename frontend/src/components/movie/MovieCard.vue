@@ -1,11 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue'
 import calendar from '@/assets/icons/calendar.svg'
 import during from '@/assets/icons/during.svg'
 import MovieEdit from '@/components/movie/MovieEdit.vue'
 import MovieDelete from '@/components/movie/MovieDelete.vue'
 import EntityCard from '@/components/shared/EntityCard.vue'
-import { motion } from 'motion-v'
 
 const props = defineProps({
     movie: {
