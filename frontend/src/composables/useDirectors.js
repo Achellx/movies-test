@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
-import { getDirectors, createDirector } from '@/api/directors';
+import { getDirectors, createDirector, updateDirector, deleteDirector } from '@/api/directors';
 
 const directorsKey = ['directors'];
 
@@ -19,5 +19,32 @@ export function useCreateDirector() {
                 queryKey: directorsKey,
             });
         },
+    })
+}
+
+export function useUpdateDirector() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: updateDirector,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: directorsKey,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['movies'],
+            })
+        }
+    })
+}
+
+export function useDeleteDirector() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: deleteDirector,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: directorsKey,
+            });
+        }
     })
 }
