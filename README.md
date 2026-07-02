@@ -4,6 +4,10 @@ Aplicación de catálogo de **películas** y **directores** con CRUD completo, c
 
 ---
 
+# Video Demo
+
+https://github.com/user-attachments/assets/16fe5696-75a1-420b-a5df-a94956a1b1a0
+
 ## Stack
 
 **Backend**
