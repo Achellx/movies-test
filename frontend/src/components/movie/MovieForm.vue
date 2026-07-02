@@ -18,7 +18,7 @@ const props = defineProps({
         type: String,
         default: "Add"
     },
-    submiting: {
+    submitting: {
         type: Boolean,
         default: false
     },
@@ -60,7 +60,7 @@ watch(() => props.initialValues,
         form.genre = movie.genre ?? ''
         form.hours = h
         form.minutes = m
-        form.fKDirector = movie.fKDirector ?? null
+        form.fKDirector = movie.fkDirector ?? null
     },
     {immediate: true}
 )
@@ -114,7 +114,7 @@ function validate() {
 }
 
 function handleSubmit() {
-    if (props.submiting) return;
+    if (props.submitting) return;
     if (!validate()) return;
 
     emit('submit', {
@@ -142,7 +142,7 @@ function handleSubmit() {
                 v-model="form.name"
                 type="text"
                 placeholder="Name"
-                :disabled="submiting"
+                :disabled="submitting"
                 :data-error="errors.name ? 'true' : null" 
                 @input="clearError('name')"
                 @focus="clearError('name')"
@@ -154,7 +154,7 @@ function handleSubmit() {
                 v-model="form.releaseYear"
                 type="text"
                 placeholder="Release Year"
-                :disabled="submiting"
+                :disabled="submitting"
                 :data-error="errors.releaseYear ? 'true' : null" 
                 @input="clearError('releaseYear')"
                 @focus="clearError('releaseYear')"
@@ -166,7 +166,7 @@ function handleSubmit() {
                 v-model="form.genre"
                 type="text"
                 placeholder="Genre"
-                :disabled="submiting"
+                :disabled="submitting"
                 :data-error="errors.genre ? 'true' : null" 
                 @input="clearError('genre')"
                 @focus="clearError('genre')"
@@ -180,7 +180,7 @@ function handleSubmit() {
                 min="0"
                 max="23"
                 placeholder="Hours"
-                :disabled="submiting"
+                :disabled="submitting"
                 :data-error="errors.duration ? 'true' : null" 
                 @input="clearError('duration')"
                 @focus="clearError('duration')"
@@ -191,7 +191,7 @@ function handleSubmit() {
                 min="0"
                 max="59"
                 placeholder="Minutes"
-                :disabled="submiting"
+                :disabled="submitting"
                 :data-error="errors.duration ? 'true' : null" 
                 @input="clearError('duration')"
                 @focus="clearError('duration')"
@@ -201,7 +201,7 @@ function handleSubmit() {
         <div class="input-box">
             <select
                 v-model="form.fKDirector"
-                :disabled="submiting"
+                :disabled="submitting"
                 :data-error="errors.fKDirector ? 'true' : null" 
                 @change="clearError('fKDirector')"
                 @focus="clearError('fKDirector')"
@@ -221,7 +221,7 @@ function handleSubmit() {
             <button
                 type="button"
                 class="secondary"
-                :disabled="submiting"
+                :disabled="submitting"
                 @click="$emit('cancel')"
             >
                 <span>Cancel</span>
@@ -229,8 +229,8 @@ function handleSubmit() {
             <button
                 type="submit"
                 class="primary"
-                :disabled="submiting"
-                :class="{'animation-loading-1' : submiting }"
+                :disabled="submitting"
+                :class="{'animation-loading-1' : submitting }"
             >
                 <span>{{ submitLabel }}</span>
             </button>
