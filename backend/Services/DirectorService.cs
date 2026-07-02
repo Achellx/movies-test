@@ -18,6 +18,7 @@ public class DirectorService : IDirectorService
     {
         var directors = await _context.Directors
             .AsNoTracking()
+            .Where(d => d.Active)
             .OrderBy(d => d.Name)
             .ToListAsync();
         return directors.Select(MapToDto);
@@ -25,7 +26,7 @@ public class DirectorService : IDirectorService
 
     public async Task<DirectorDto?> GetByIdAsync(int id)
     {
-        var director = await _context.Directors.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
+        var director = await _context.Directors.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id && d.Active);
         return director is null ? null : MapToDto(director);
     }
 

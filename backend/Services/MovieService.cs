@@ -27,7 +27,7 @@ public class MovieService : IMovieService
 
     public async Task<MovieDto?> GetByIdAsync(int id)
     {
-        var movie = await _context.Movies.AsNoTracking().Include(m => m.Director).FirstOrDefaultAsync(m => m.Id == id);
+        var movie = await _context.Movies.AsNoTracking().Include(m => m.Director).FirstOrDefaultAsync(m => m.Id == id && m.Active);
         return movie is null ? null : MapToDto(movie);
     }
 
@@ -59,9 +59,11 @@ public class MovieService : IMovieService
         if (movie is null)
             return MovieUpdateResult.MovieNotFound;
 
-
-        var directorExists = await _context.Directors.AnyAsync(d => d.Id == dto.FKDirector && d.Active);
-        if (!directorExists) return MovieUpdateResult.DirectorNotFound;
+        if (dto.FKDirector != movie.FKDirector)
+        {
+            var directorExists = await _context.Directors.AnyAsync(d => d.Id == dto.FKDirector && d.Active);
+            if (!directorExists) return MovieUpdateResult.DirectorNotFound;
+        }
 
         movie.Name = dto.Name;
         movie.ReleaseYear = dto.ReleaseYear;
