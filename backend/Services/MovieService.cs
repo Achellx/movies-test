@@ -18,6 +18,7 @@ public class MovieService : IMovieService
     {
         var movies = await _context.Movies
         .AsNoTracking()
+        .Where(m => m.Active)
         .Include(m => m.Director)
         .OrderByDescending(m => m.Id)
         .ToListAsync();
