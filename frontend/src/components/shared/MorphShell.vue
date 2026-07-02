@@ -1,12 +1,8 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, nextTick, onUnmounted } from "vue";
 import { motion, AnimatePresence } from "motion-v";
 
 const props = defineProps({
-  collapsedSize: {
-    type: Object,
-    default: () => ({ width: 124, height: 44 }),
-  },
   borderRadius: { 
     type: [Number, String], 
     default: 32 
@@ -15,17 +11,9 @@ const props = defineProps({
     type: String, 
     default: "var(--color-bg)" 
   },
-  collapsedBackground: { 
-    type: String, 
-    default: null 
-  },
-  collapsedRadius: { 
-    type: [Number, String], 
-    default: null 
-  },
-  spring: {
-    type: Object,
-    default: () => ({ type: "spring", duration: 0.6, bounce: 0 }),
+  spring: { 
+    type: Object, 
+    default: () => ({ type: "spring", duration: 0.6, bounce: 0 }) 
   },
   swapDuration: { 
     type: Number, 
@@ -33,179 +21,226 @@ const props = defineProps({
   },
   swapDelay: { 
     type: Number, 
-    default: 0.25
+    default: 0.25 
   },
   backdrop: { 
     type: Boolean, 
     default: true 
   },
+  offset: { 
+    type: Number, 
+    default: 8 
+  },
 });
 
 const expanded = defineModel({ type: Boolean, default: false });
-
 const css = (v) => (typeof v === "number" ? `${v}px` : v);
 
+const originRef  = ref(null);
 const contentRef = ref(null);
-const measuredWidth = ref(0);
-const measuredHeight = ref(0);
-let ro;
 
-onMounted(() => {
-  ro = new ResizeObserver(() => {
-    const el = contentRef.value;
-    if (!el) return;
-    measuredWidth.value = el.offsetWidth;
-    measuredHeight.value = el.offsetHeight;
-  });
-  if (contentRef.value) ro.observe(contentRef.value);
-});
+const origin  = ref(null); 
+const size    = ref(null); 
+const visible = ref(false);
 
-onUnmounted(() => ro && ro.disconnect());
+let ro = null;
+let closeTimer = null;
+const closeMs = computed(() => (props.spring?.duration ?? 0.6) * 1000);
 
-const miniRef = ref(null);
-const originBackground = ref(null);
-const originRadius = ref(null);
-const measuredCollapsed = ref(null);
-let miniRo;
-
-onMounted(() => {
-  const host = miniRef.value?.$el ?? miniRef.value;
+function readOrigin() {
+  const host = originRef.value?.$el ?? originRef.value;
   const el = host?.firstElementChild ?? host;
-  if (!(el instanceof HTMLElement)) return;
-
-  const styles = window.getComputedStyle(el);
-  originBackground.value = styles.backgroundColor;
-  originRadius.value = styles.borderRadius;
-
-  const measure = () => {
-    measuredCollapsed.value = { width: el.offsetWidth, height: el.offsetHeight };
+  if (!(el instanceof HTMLElement)) return null;
+  const r = el.getBoundingClientRect();
+  const s = window.getComputedStyle(el);
+  return {
+    top: r.top, left: r.left, width: r.width, height: r.height,
+    borderRadius: s.borderRadius,
+    background: s.backgroundColor,
+    boxShadow: s.boxShadow,
   };
-  measure();
-  miniRo = new ResizeObserver(measure);
-  miniRo.observe(el);
+}
+
+function measure() {
+  const el = contentRef.value;
+  if (el) size.value = { 
+    width: el.offsetWidth, 
+    height: el.offsetHeight 
+  };
+}
+
+watch(expanded, (val) => (val ? runOpen() : runClose()));
+
+async function runOpen() {
+  if (closeTimer) { 
+    clearTimeout(closeTimer); 
+    closeTimer = null; 
+  }
+
+  size.value = null;
+  origin.value = readOrigin();
+  visible.value = true;
+
+  await nextTick();
+
+  requestAnimationFrame(() => {
+    measure();
+    if (ro) ro.disconnect();
+    ro = new ResizeObserver(measure);
+    if (contentRef.value) ro.observe(contentRef.value);
+  });
+
+  window.addEventListener("keydown", onKey);
+}
+
+function runClose() {
+  if (!visible.value) return;
+
+  window.removeEventListener("keydown", onKey);
+
+  if (ro) { 
+    ro.disconnect(); 
+    ro = null; 
+  }
+
+  closeTimer = window.setTimeout(() => {
+    visible.value = false;
+    closeTimer = null;
+  }, closeMs.value);
+}
+
+function onKey(e) { if (e.key === "Escape") close(); }
+
+function open()  { expanded.value = true; }
+function close() { expanded.value = false; }
+
+const target = computed(() => {
+  if (!origin.value || !size.value) return null;
+
+  const vw = window.innerWidth, vh = window.innerHeight, safe = 8;
+
+  const w = size.value.width, h = size.value.height;
+
+  const r = origin.value;
+
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+  const left = r.left < vw / 2 ? r.left - props.offset : r.left + r.width  + props.offset - w;
+
+  const top  = r.top  < vh / 2 ? r.top  - props.offset : r.top  + r.height + props.offset - h;
+
+  return {
+    left: Math.round(clamp(left, safe, Math.max(safe, vw - w - safe))),
+    top:  Math.round(clamp(top,  safe, Math.max(safe, vh - h - safe))),
+    width: w, height: h,
+  };
 });
 
-onUnmounted(() => miniRo && miniRo.disconnect());
+const collapsedPose = computed(() => origin.value ? {
+  top: origin.value.top, left: origin.value.left,
+  width: origin.value.width, height: origin.value.height,
+  borderRadius: origin.value.borderRadius,
+  backgroundColor: origin.value.background,
+  boxShadow: origin.value.boxShadow,
+} : {});
 
-const collapsedDims = computed(() => measuredCollapsed.value ?? props.collapsedSize);
+const expandedPose = computed(() => target.value ? {
+  top: target.value.top, left: target.value.left,
+  width: target.value.width, height: target.value.height,
+  borderRadius: css(props.borderRadius),
+  backgroundColor: props.expandedBackground,
+  boxShadow: "0 12px 40px #00000026",
+} : collapsedPose.value);
 
-const collapsedBg = computed(
-  () => props.collapsedBackground ?? originBackground.value ?? props.expandedBackground
-);
+const isOpen = computed(() => expanded.value && !!size.value);
+const boxAnimate = computed(() => isOpen.value ? expandedPose.value : collapsedPose.value);
 
-const collapsedRad = computed(
-  () => props.collapsedRadius ?? originRadius.value ?? css(props.borderRadius)
-);
-
-const animatedSize = computed(() =>
-  expanded.value
-    ? {
-        width: `${measuredWidth.value}px`,
-        height: `${measuredHeight.value}px`,
-        backgroundColor: props.expandedBackground,
-        borderRadius: css(props.borderRadius),
-      }
-    : {
-        width: css(collapsedDims.value.width),
-        height: css(collapsedDims.value.height),
-        backgroundColor: collapsedBg.value,
-        borderRadius: collapsedRad.value,
-      }
-);
-
-const contentMin = computed(() => ({
-  minWidth: measuredWidth.value ? `${measuredWidth.value}px` : undefined,
-  minHeight: measuredHeight.value ? `${measuredHeight.value}px` : undefined,
+const miniAnimate = computed(() => ({
+  opacity: isOpen.value ? 0 : 1,
+  filter:  isOpen.value ? "blur(2px)" : "blur(0px)",
+  transition: isOpen.value
+    ? { duration: props.swapDuration * 0.5 }
+    : { duration: props.swapDuration, delay: props.swapDelay },
 }));
 
-const miniTransition = computed(() =>
-  expanded.value
-    ? { duration: props.swapDuration * 0.5 }
-    : { duration: props.swapDuration, delay: props.swapDelay }
-);
-const expandTransition = computed(() =>
-  expanded.value
+const expandAnimate = computed(() => ({
+  opacity: isOpen.value ? 1 : 0,
+  filter:  isOpen.value ? "blur(0px)" : "blur(2px)",
+  transition: isOpen.value
     ? { duration: props.swapDuration, delay: props.swapDelay }
-    : { duration: props.swapDuration * 0.5 }
-);
+    : { duration: props.swapDuration * 0.5 },
+}));
 
-const open = () => (expanded.value = true);
-const close = () => (expanded.value = false);
+onUnmounted(() => {
+  if (ro) ro.disconnect();
+  if (closeTimer) clearTimeout(closeTimer);
+  window.removeEventListener("keydown", onKey);
+});
 
 defineExpose({ open, close });
 </script>
 
 <template>
-  <div
-    class="morph-shell-placeholder"
-    :style="{ width: css(collapsedDims.width), height: css(collapsedDims.height) }"
+  <span
+    ref="originRef"
+    class="morph-origin"
+    :style="{ visibility: expanded ? 'hidden' : 'visible' }"
   >
+    <slot name="collapsed" :open="open" />
+  </span>
+
+  <Teleport to="body">
+    <AnimatePresence>
+      <motion.div
+        v-if="backdrop && isOpen"
+        key="morph-backdrop"
+        class="morph-backdrop"
+        :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :exit="{ opacity: 0 }"
+        :transition="spring"
+        @click="close"
+      />
+    </AnimatePresence>
+
     <motion.div
+      v-if="visible"
       class="morph-shell"
-      :animate="animatedSize"
+      :initial="collapsedPose"
+      :animate="boxAnimate"
       :transition="spring"
-      role="button"
-      :tabindex="expanded ? -1 : 0"
-      @click="!expanded && open()"
-      @keydown.enter.prevent="!expanded && open()"
-      @keydown.esc="expanded && close()"
     >
       <motion.div
-        ref="miniRef"
         class="morph-mini"
-        :animate="{ opacity: expanded ? 0 : 1, filter: expanded ? 'blur(2px)' : 'blur(0px)' }"
-        :transition="miniTransition"
-        :style="{ pointerEvents: expanded ? 'none' : 'auto' }"
+        :initial="{ opacity: 1, filter: 'blur(0px)' }"
+        :animate="miniAnimate"
+        :style="{ pointerEvents: isOpen ? 'none' : 'auto' }"
       >
         <slot name="collapsed" :open="open" />
       </motion.div>
 
       <motion.div
         class="morph-expand"
-        :animate="{ opacity: expanded ? 1 : 0, filter: expanded ? 'blur(0px)' : 'blur(2px)' }"
-        :transition="expandTransition"
-        :style="{ pointerEvents: expanded ? 'auto' : 'none' }"
+        :initial="{ opacity: 0, filter: 'blur(2px)' }"
+        :animate="expandAnimate"
+        :style="{ pointerEvents: isOpen ? 'auto' : 'none' }"
         @click.stop
       >
-        <div ref="contentRef" class="morph-content" :style="contentMin">
+        <div ref="contentRef" class="morph-content">
           <slot name="expanded" :close="close" />
         </div>
       </motion.div>
     </motion.div>
-
-    <AnimatePresence>
-      <motion.div
-        v-if="backdrop && expanded"
-        key="backdrop"
-        class="morph-shell-backdrop"
-        :initial="{ opacity: 0 }"
-        :animate="{ opacity: 1 }"
-        :exit="{ opacity: 0 }"
-        :transition="spring"
-        @click="close"
-      />
-    </AnimatePresence>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
-.morph-shell-placeholder {
-  z-index: 700;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.morph-origin {
+  display: inline-flex;
 }
 
 .morph-shell {
-  position: absolute;
-  top:    var(--morph-top, 0);
-  left:   var(--morph-left, 0);
-  right:  var(--morph-right, auto);
-  bottom: var(--morph-bottom, auto);
+  position: fixed;
+  z-index: 1000;
   overflow: hidden;
-  cursor: pointer;
-  outline: none;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -225,22 +260,24 @@ defineExpose({ open, close });
 .morph-expand {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .morph-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  max-width: calc(100vw - 16px);
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   padding: 16px;
 }
 
-.morph-shell-backdrop {
-  z-index: -1;
-  background: #0000004d;
+.morph-backdrop {
   position: fixed;
   inset: 0;
+  z-index: 999;
+  background: #0000004d;
 }
 </style>
